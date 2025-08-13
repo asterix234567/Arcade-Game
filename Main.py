@@ -1,40 +1,68 @@
 import arcade
 
-# Fenster-Konstanten
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Mein erstes Arcade-Fenster"
+SCREENWIDTH = 1400
+SCREEN_HEIGHT = 800
 
-class MyGame(arcade.Window):
-    """
-    Hauptklasse für das Spiel.
-    """
-    def __init__(self, width, height, title):
-        # Ruft den Konstruktor der Elternklasse auf
-        super().__init__(width, height, title)
+WINDOWCENTER_X = SCREENWIDTH // 2
+WINDOWCENTER_Y = SCREEN_HEIGHT // 2
 
-        # Setzt die Hintergrundfarbe
-        arcade.set_background_color(arcade.color.AMAZON)
+#Player 
+player_width = 40
+player_height = 35
+PLAYERSPEED = 5
 
+    
+def draw_player(center_x, center_y):
+        #Top-Coordinate
+        x1 = center_x - player_width // 2
+        y1 = center_y + player_height // 2
+        
+        #Right Coordinate
+        x2 = center_x + player_width // 2     
+        y2 = center_y
+        
+        #Bottom-Coordinate
+        x3 = center_x - player_width // 2
+        y3 = center_y - player_height // 2
+        
+        arcade.draw_triangle_filled(x1, y1, x2, y2, x3, y3, arcade.color.BLACK)
+
+
+class MyGameWindow(arcade.Window):
+    def __init__(self, title):
+        super().__init__(SCREENWIDTH, SCREEN_HEIGHT, title)
+        arcade.set_background_color(arcade.color.BABY_BLUE)
+
+        #Player Center Coordinates
+        self.player_x = WINDOWCENTER_X
+        self.player_y = WINDOWCENTER_Y
+        
+        #List of all Keys that are used
+        self.held_keys = set()
+        
     def on_draw(self):
-        """
-        Wird aufgerufen, wenn das Fenster neu gezeichnet werden muss.
-        """
-        # Löscht den Bildschirm mit der eingestellten Hintergrundfarbe
-        # Dies ersetzt arcade.start_render()
-        self.clear() 
-
-        # Zeichne einen blauen Kreis in der Mitte des Fensters
-        arcade.draw_circle_filled(
-            SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 50, arcade.color.BLUE
-        )
+        self.clear()
+                    
+        #Drawing the Players Triangle
+        draw_player(self.player_x, self.player_y)
+    
+    def on_key_press(self, key, modifiers):
+        # add the last key that was pressed to the current pressed keys
+        self.held_keys.add(key)
+        
+    def on_key_release(self, key, modifiers):
+        # removes the last released key from the current pressed keys
+        if key in self.held_keys:
+            self.held_keys.remove(key)
+        
+    def on_update(self, delta_time):
+        # Moves the player if the key is still pressed
+        if arcade.key.W in self.held_keys:
+            self.player_y += PLAYERSPEED            
 
 def main():
-    """
-    Hauptfunktion des Programms.
-    """
-    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = MyGameWindow("SpaceWaves")
     arcade.run()
-
+    
 if __name__ == "__main__":
     main()
