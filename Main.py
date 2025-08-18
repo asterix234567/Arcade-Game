@@ -2,20 +2,20 @@ import arcade
 import math
 
 SCREENWIDTH = 1400
-SCREEN_HEIGHT = 800
+SCREENHEIGHT = 800
 
 SCREENCENTER_X = SCREENWIDTH // 2
-SCREENCENTER_Y = SCREEN_HEIGHT // 2
+SCREENCENTER_Y = SCREENHEIGHT // 2
 
 # Player 
-player_width = 40
-player_height = 35
-PLAYERSPEED = 8
+player_width = 50
+player_height = 45
+PLAYERSPEED = 5
 
 class Player:
-    def __init__(self, center_x, center_y, rotation):
-        self.center_x = center_x
-        self.center_y = center_y
+    def __init__(self, rotation):
+        self.center_x = SCREENCENTER_X
+        self.center_y = SCREENCENTER_Y
         self.angle = rotation  # In degrees
         
     def draw(self):
@@ -46,17 +46,24 @@ class Player:
 
 class MyGameWindow(arcade.Window):
     def __init__(self, title):
-        super().__init__(SCREENWIDTH, SCREEN_HEIGHT, title)
+        super().__init__(SCREENWIDTH, SCREENHEIGHT, title)
         arcade.set_background_color(arcade.color.BABY_BLUE)
 
         # Create the player in __init__, not in on_draw
-        self.player = Player(SCREENCENTER_X, SCREENCENTER_Y, 0)
+        self.player = Player(0)
         
         # List of all Keys that are used
         self.held_keys = set()
+        
+        # List of all player positions on the Screen (as tuples)
+        self.positions = []
+        self.max_path_length = 50  # Maximum number of positions to store
             
     def on_draw(self):
         self.clear()
+        
+         # Update player path
+        self.update_player_path(self.player.center_x, self.player.center_y)
         
         self.key_inputs()           # process inputs by the player 
         self.player_collision()
@@ -65,8 +72,24 @@ class MyGameWindow(arcade.Window):
         if bool(self.player.angle):
             self.player.angle = self.get_player_rotation()
         
+        # Draw the Line behind the player (only if we have positions)
+        if len(self.positions) > 1:
+            arcade.draw_line_strip(self.positions, arcade.color.WHITE, 8)
+        
         # Draw the player
         self.player.draw()
+        
+    def update_player_path(self, x, y):
+        # Add current position as a tuple
+        self.positions.append((x, y))
+        
+        for i in range(len(self.positions)):
+            x, y = self.positions[i]
+            self.positions[i] = (x - PLAYERSPEED, y)
+             
+        # Limit the length of the path
+        if self.positions[0][0] <= 0:
+            self.positions.pop(0)  # Remove oldest position
     
     def get_player_rotation(self):
         # Determine rotation based on movement direction
@@ -98,8 +121,8 @@ class MyGameWindow(arcade.Window):
 
     def player_collision(self):
         # Top and Bottom Coordinate - Same as in draw Player: Same Same, but different
-        if self.player.center_y + player_height // 2 > SCREEN_HEIGHT:
-            self.player.center_y = SCREEN_HEIGHT - player_height // 2
+        if self.player.center_y + player_height // 2 > SCREENHEIGHT:
+            self.player.center_y = SCREENHEIGHT - player_height // 2
             
             self.player.angle = 0
         
