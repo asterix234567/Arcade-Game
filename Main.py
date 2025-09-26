@@ -129,13 +129,15 @@ class MyGameWindow(arcade.Window):
         # Update and Draw Obstacles
         obstacles_to_keep = []
         for obst in self.obstacles:
-            obst.update()
-            obst.draw()
+            obst.update()       # Move the obstacle to the left
+            obst.draw()         # Draw the obstacle
+            if not obst.is_off_screen():
+                obstacles_to_keep.append(obst)
+
             self.paused = Player.obstacle_collision(self.player, obst) # Check for collision
             if self.paused:
                 break  # Exit the loop if the game is paused due to a collision
-            if not obst.is_off_screen():
-                obstacles_to_keep.append(obst)
+
                 
         self.obstacles = obstacles_to_keep
 
@@ -199,7 +201,8 @@ class MyGameWindow(arcade.Window):
             self.player.center_y -= GAMESPEED
     
     def on_update(self, delta_time):
-   
+        delta_time # time since last update in seconds.
+
         self.time_since_last_obstacle += delta_time
 
 
