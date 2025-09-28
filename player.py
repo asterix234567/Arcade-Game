@@ -12,6 +12,9 @@ class Player:
 
         self.height = 45
         self.width = 50
+
+        self.death_animation_frames = 80  #Width of the Death Circle = player.width // death_animation_frames
+        self.death_current_frame = 0 
         
     def draw(self):
         # Calculate the rotated points of the triangle
@@ -62,3 +65,11 @@ class Player:
             self.center_y - self.height // 2 < obstacle.y + obstacle.height):
             return True
         return False
+    
+    def collision_animation(self):
+
+        circle_radius = self.death_animation_frames * (1 - math.e**(-1 *(0.01 * self.death_current_frame)))
+        arcade.draw_circle_filled(self.center_x, self.center_y, circle_radius, arcade.color.RED)
+        #circle_radius = 10 + 40 * math.log1p(self.death_current_frame)
+        #arcade.draw_circle_filled(self.center_x, self.center_y, circle_radius, arcade.color.RED)
+        self.death_current_frame += 1

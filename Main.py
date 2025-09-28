@@ -4,7 +4,7 @@ import random
 
 from player import Player
 from obstacle import Obstacle
-
+from config import *
 
 SCREENWIDTH = 1400
 SCREENHEIGHT = 800
@@ -12,18 +12,14 @@ SCREENHEIGHT = 800
 SCREENCENTER_X = SCREENWIDTH // 2
 SCREENCENTER_Y = SCREENHEIGHT // 2
 
-# General Game Variables
-GAMESPEED = 8
 
-# Time (s) it takes for the next Obstacle to spawn 
-OBSTACLESPAWNSPEED = 1
 
 class MyGameWindow(arcade.Window):
     def __init__(self, title):
         super().__init__(SCREENWIDTH, SCREENHEIGHT, title)
         arcade.set_background_color(arcade.color.BABY_BLUE)
 
-        # Create the player in __init__, not in on_draw
+        # Create the player
         self.player = Player(0)
         
         # List of all Keys that are used
@@ -36,55 +32,63 @@ class MyGameWindow(arcade.Window):
         self.obstacles = [] # List to store Obstacle objects
         self.time_since_last_obstacle = 0  # Timer to track obstacle spawning
 
-        self.paused = False # Game paused state
+        self.end_by_collision = False # Game paused state
+
+        
 
             
     def on_draw(self):
 
         self.clear()
 
-        if self.paused:
-            arcade.draw_text("Paused", SCREENCENTER_X // 2, SCREENCENTER_Y // 2, arcade.color.BLACK, 50)
+        if self.end_by_collision:
+            
+            if self.player.death_current_frame == self.player.death_animation_frames:       # If the animation is done, pause the game
+                arcade.draw_text("Paused", SCREENCENTER_X // 2, SCREENCENTER_Y // 2, arcade.color.BLACK, 50)
+            else:
+                self.update_player_path(self.player.center_x, self.player.center_y)
+                for obst in self.obstacles:
+                    obst.draw()         # Draw the obstacle
+                Player.collision_animation(self.player) # Show collision animation
             return  # Skip drawing/updating game objects
-        
-        # Add new Obstacles 
-        if self.time_since_last_obstacle - OBSTACLESPAWNSPEED >= 0:
-            self.obstacles.append(Obstacle()) 
-            self.time_since_last_obstacle = 0
+        else:
+            # Add new Obstacles 
+            if self.time_since_last_obstacle - OBSTACLESPAWNSPEED >= 0:
+                self.obstacles.append(Obstacle()) 
+                self.time_since_last_obstacle = 0
 
-        # Update and Draw Obstacles
-        obstacles_to_keep = []
-        for obst in self.obstacles:
-            obst.update()       # Move the obstacle to the left
-            obst.draw()         # Draw the obstacle
-            if not obst.is_off_screen():
-                obstacles_to_keep.append(obst)
+            # Update and Draw Obstacles
+            obstacles_to_keep = []
+            for obst in self.obstacles:
+                obst.update()       # Move the obstacle to the left
+                obst.draw()         # Draw the obstacle
+                if not obst.is_off_screen():
+                    obstacles_to_keep.append(obst)
 
-            self.paused = Player.obstacle_collision(self.player, obst) # Check for collision
-            if self.paused:
-                break  # Exit the loop if the game is paused due to a collision
+                self.end_by_collision = Player.obstacle_collision(self.player, obst) # Check for collision
+                if self.end_by_collision:
+                    break  # Exit the loop if the game is paused due to a collision
 
                 
-        self.obstacles = obstacles_to_keep
+                self.obstacles = obstacles_to_keep
 
-         # Update player path
-        self.update_player_path(self.player.center_x, self.player.center_y)
+            # Update player path
+            self.update_player_path(self.player.center_x, self.player.center_y)
         
-        self.key_inputs()           # process inputs by the player 
-        self.player.screen_collision ()   # check for collisions with the screen borders
+            self.key_inputs()           # process inputs by the player 
+            self.player.screen_collision ()   # check for collisions with the screen borders
         
 
-        # Update the player's rotation
-        if bool(self.player.angle):
-            self.player.angle = self.get_player_rotation()
+            # Update the player's rotation
+            if bool(self.player.angle):
+                self.player.angle = self.get_player_rotation()
         
-        # Draw the Line behind the player (only if we have positions)
-        if len(self.positions) > 1:
-            arcade.draw_line_strip(self.positions, arcade.color.WHITE, 8)
+            # Draw the Line behind the player (only if we have positions)
+            if len(self.positions) > 1:
+                arcade.draw_line_strip(self.positions, arcade.color.WHITE, 8)
         
-        # Draw the player
-        self.player.draw()
-        
+            # Draw the player
+            self.player.draw()
 
     def update_player_path(self, x, y):
         # Add current position as a tuple
