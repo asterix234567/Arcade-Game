@@ -2,6 +2,10 @@ import arcade
 import math
 import random
 
+from player import Player
+from obstacle import Obstacle
+
+
 SCREENWIDTH = 1400
 SCREENHEIGHT = 800
 
@@ -13,84 +17,6 @@ GAMESPEED = 8
 
 # Time (s) it takes for the next Obstacle to spawn 
 OBSTACLESPAWNSPEED = 1
-
-class Obstacle:
-    def __init__(self):
-
-        self.height = random.randint(100, 500)
-        self.width = random.randint(100, 300)
-
-        self.x = SCREENWIDTH
-        self.y = random.choice([0, SCREENHEIGHT - self.height])
-
-    def update(self):
-        self.x -= GAMESPEED  # Move obstacle to the left
-    
-    def is_off_screen(self):
-        if self.x + self.width < 0:
-            return True
-        
-    def draw(self):
-        arcade.draw_lbwh_rectangle_filled(self.x, self.y, self.width, self.height, arcade.color.VIOLET)
-
-class Player:
-    def __init__(self, rotation):
-        self.center_x = SCREENCENTER_X
-        self.center_y = SCREENCENTER_Y
-        self.angle = rotation  # In degrees
-
-        self.height = 45
-        self.width = 50
-        
-    def draw(self):
-        # Calculate the rotated points of the triangle
-        angle_rad = math.radians(self.angle)
-        cos_val = math.cos(angle_rad)
-        sin_val = math.sin(angle_rad)
-        
-        # Original triangle points (relative to center)
-        points = [
-            [-self.width // 2, -self.height // 2],  # Bottom-left
-            [-self.width // 2, self.height // 2],   # Top-left
-            [self.width // 2, 0]                      # Right
-        ]
-        
-        # Rotate and translate the points
-        rotated_points = []
-        for x, y in points:
-            # Apply rotation
-            rotated_x = x * cos_val - y * sin_val
-            rotated_y = x * sin_val + y * cos_val
-            
-            # Translate to center position
-            rotated_points.append((rotated_x + self.center_x, rotated_y + self.center_y))
-        
-        # Draw the rotated triangle
-        arcade.draw_polygon_filled(rotated_points, arcade.color.BLACK)
-
-    def screen_collision(self):
-        # Top and Bottom Coordinate - Same as in draw Player: Same Same, but different
-        if self.center_y + self.height // 2 > SCREENHEIGHT:
-            self.center_y = SCREENHEIGHT - self.height // 2
-            
-            self.angle = 0
-        
-        elif self.center_y - self.height // 2 < 0:
-            self.center_y = 0 + self.height // 2
-            
-            self.angle = 0
-
-        else:
-            self.angle = 1
-
-    def obstacle_collision(self, obstacle):
-        # Check for collision with an obstacle
-        if (self.center_x + self.width // 2 > obstacle.x and
-            self.center_x - self.width // 2 < obstacle.x + obstacle.width and
-            self.center_y + self.height // 2 > obstacle.y and
-            self.center_y - self.height // 2 < obstacle.y + obstacle.height):
-            return True
-        return False
 
 class MyGameWindow(arcade.Window):
     def __init__(self, title):
