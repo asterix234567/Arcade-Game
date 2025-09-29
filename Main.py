@@ -6,14 +6,6 @@ from player import Player
 from obstacle import Obstacle
 from config import *
 
-SCREENWIDTH = 1400
-SCREENHEIGHT = 800
-
-SCREENCENTER_X = SCREENWIDTH // 2
-SCREENCENTER_Y = SCREENHEIGHT // 2
-
-
-
 class MyGameWindow(arcade.Window):
     def __init__(self, title):
         super().__init__(SCREENWIDTH, SCREENHEIGHT, title)
@@ -34,7 +26,7 @@ class MyGameWindow(arcade.Window):
 
         self.end_by_collision = False # Game paused state
 
-        
+        print(type(arcade.Rect))
 
             
     def on_draw(self):
@@ -46,11 +38,14 @@ class MyGameWindow(arcade.Window):
             if self.player.death_current_frame == self.player.death_animation_frames:       # If the animation is done, pause the game
                 arcade.draw_text("Paused", SCREENCENTER_X // 2, SCREENCENTER_Y // 2, arcade.color.BLACK, 50)
             else:
-                self.update_player_path(self.player.center_x, self.player.center_y)
+                arcade.draw_line_strip(self.positions, arcade.color.WHITE, 8)
                 for obst in self.obstacles:
                     obst.draw()         # Draw the obstacle
+
                 Player.collision_animation(self.player) # Show collision animation
+            
             return  # Skip drawing/updating game objects
+        
         else:
             # Add new Obstacles 
             if self.time_since_last_obstacle - OBSTACLESPAWNSPEED >= 0:
