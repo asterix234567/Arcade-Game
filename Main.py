@@ -26,7 +26,8 @@ class MyGameWindow(arcade.Window):
 
         self.end_by_collision = False # Game paused state
 
-        print(type(arcade.Rect))
+        #Load obstacle texture
+        self.obstacle_texture = arcade.load_texture("Obstacle_texture/texture.png")
 
             
     def on_draw(self):
@@ -49,7 +50,7 @@ class MyGameWindow(arcade.Window):
         else:
             # Add new Obstacles 
             if self.time_since_last_obstacle - OBSTACLESPAWNSPEED >= 0:
-                self.obstacles.append(Obstacle()) 
+                self.obstacles.append(Obstacle(self.obstacle_texture)) 
                 self.time_since_last_obstacle = 0
 
             # Update and Draw Obstacles

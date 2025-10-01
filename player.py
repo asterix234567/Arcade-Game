@@ -85,19 +85,10 @@ class Player:
     
     def collision_animation(self): # Draw expanding red circle
         
-        # # For faster Expansion change the multiplier of death_current_frame
-        # circle_radius = self.death_animation_frames * (1 - math.e**(-1 *(0.02 * self.death_current_frame)))
-        # arcade.draw_circle_filled(self.center_x, self.center_y, circle_radius, arcade.color.RED)
-        
-        # self.death_current_frame += 1
-
-        #collision_animation_rect = arcade.rect(400, 400, 400, 400)
-        #collision_animation_rect = arcade.Rect.(self.center_x, self.center_y, self.width, self.height)
-        #collision_animation_rect = arcade.Rect.__new__(self.width, self.height, self.center_x, self.center_y)
         if len(self.collision_animation_textures) - self.collision_animation_index:
             self.collision_animation_rect = Rect(self.center_x, self.center_y, self.width * self.collision_animation_size, self.height * self.collision_animation_size)
 
-        if self.collision_animation_index <= len(self.collision_animation_textures):
-            #collision_animation_rect = arcade.Rect(self.width, self.height, self.center_x, self.center_y)
+        if self.collision_animation_index < len(self.collision_animation_textures):
+            # Draw the current frame of the collision animation with the updated rectangle
             arcade.draw_texture_rect(self.collision_animation_textures[self.collision_animation_index], self.collision_animation_rect)
             self.collision_animation_index += 1
