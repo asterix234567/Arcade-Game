@@ -25,9 +25,7 @@ class Player:
         self.death_current_frame = 0 
 
         self.collision_animation_textures = []       # List of textures for death animation
-        for i in range(1, 19):                        # Number of frames in the animation
-            texture = arcade.load_texture(f"Player_collision_animation/Blue Ring Explosion{i}.png")
-            self.collision_animation_textures.append(texture)
+        
         self.collision_animation_index = 0      # Current frame in the collision animation
 
         self.collision_animation_size = 4 # Size multiplier for the collision animation - size of the player * animation_size

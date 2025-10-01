@@ -26,8 +26,15 @@ class MyGameWindow(arcade.Window):
 
         self.end_by_collision = False # Game paused state
 
+        collision_frames = []       # List of textures for death animation
+        for i in range(1, 19):                        # Number of frames in the animation
+            texture = arcade.load_texture(f"textures/Player/collision_animation/Blue Ring Explosion{i}.png")
+            collision_frames.append(texture)
+
+        self.player.collision_animation_textures = collision_frames      # Assign the loaded textures to the player
+
         #Load obstacle texture
-        self.obstacle_texture = arcade.load_texture("Obstacle_texture/texture.png")
+        self.obstacle_texture = arcade.load_texture("textures/Obstacle/building.png")
 
             
     def on_draw(self):
