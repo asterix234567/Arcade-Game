@@ -26,12 +26,17 @@ class MyGameWindow(arcade.Window):
 
         self.end_by_collision = False # Game paused state
 
+        # Load collision animation textures
         collision_frames = []       # List of textures for death animation
-        for i in range(1, 19):                        # Number of frames in the animation
+        self.player.collision_animation_frames = 19      # Number of frames/files in the animation
+        for i in range(1, self.player.collision_animation_frames):              
             texture = arcade.load_texture(f"textures/Player/collision_animation/Blue Ring Explosion{i}.png")
             collision_frames.append(texture)
-
         self.player.collision_animation_textures = collision_frames      # Assign the loaded textures to the player
+
+        #Load player texture
+        self.texture = arcade.load_texture("textures/Player/plane.png")
+        self.player.texture = self.texture
 
         #Load obstacle texture
         self.obstacle_texture = arcade.load_texture("textures/Obstacle/building.png")
@@ -43,7 +48,7 @@ class MyGameWindow(arcade.Window):
 
         if self.end_by_collision:
             
-            if self.player.death_current_frame == self.player.death_animation_frames:       # If the animation is done, pause the game
+            if self.player.collision_animation_index == self.player.death_animation_frames:       # If the animation is done, pause the game
                 arcade.draw_text("Paused", SCREENCENTER_X // 2, SCREENCENTER_Y // 2, arcade.color.BLACK, 50)
             else:
                 arcade.draw_line_strip(self.positions, arcade.color.WHITE, 8)
@@ -85,11 +90,15 @@ class MyGameWindow(arcade.Window):
             # Update the player's rotation
             if bool(self.player.angle):
                 self.player.angle = self.get_player_rotation()
+            print(self.player.angle)
         
             # Draw the Line behind the player (only if we have positions)
             if len(self.positions) > 1:
                 arcade.draw_line_strip(self.positions, arcade.color.WHITE, 8)
         
+            # Update the player hitbox
+            self.player.update_hitbox()
+
             # Draw the player
             self.player.draw()
 

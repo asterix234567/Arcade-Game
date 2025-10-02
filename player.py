@@ -5,33 +5,41 @@ from config import *
 
 
 class Rect:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.width = 0
+        self.height = 0
+
+class rect:
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
 
-
 class Player:
     def __init__(self, rotation):
         self.center_x = SCREENCENTER_X
         self.center_y = SCREENCENTER_Y
-        self.angle = rotation  # In degrees
+        self.angle = 0  # In degrees
 
-        self.height = 45
-        self.width = 50
-
-        self.death_animation_frames = 60  #Width of the Death Circle = player.width // death_animation_frames
-        self.death_current_frame = 0 
+        self.height = 40
+        self.width = 70
 
         self.collision_animation_textures = []       # List of textures for death animation
-        
         self.collision_animation_index = 0      # Current frame in the collision animation
-
         self.collision_animation_size = 4 # Size multiplier for the collision animation - size of the player * animation_size
+        self.collision_animation_frames = 0      # Number of frames in the death animation
+
+        self.texture = 0  # Placeholder for player texture
+        self.texture_corners = []  # List to hold the corner points of the texture
+        self.texture_rotated_corners = []  # List to hold the rotated corner points
+        self.texture_rect = Rect() # Rectangle for texture drawing
         
 
-    def draw(self):
+    def update_hitbox(self):
+
         # Calculate the rotated points of the triangle
         angle_rad = math.radians(self.angle)
         cos_val = math.cos(angle_rad)
@@ -55,14 +63,21 @@ class Player:
             rotated_points.append((rotated_x + self.center_x, rotated_y + self.center_y))
         
         # Draw the rotated triangle
-        arcade.draw_polygon_filled(rotated_points, arcade.color.BLACK)
+        #arcade.draw_polygon_filled(rotated_points, arcade.color.BLACK)
+
+    def draw(self):
+        
+        
+
+        # Draw the texture using the rotated corners
+        arcade.draw_texture_rect(self.texture, self.texture_rect)
 
     def screen_collision(self):
         # Top and Bottom Coordinate - Same as in draw Player: Same Same, but different
         if self.center_y + self.height // 2 > SCREENHEIGHT:
-            self.center_y = SCREENHEIGHT - self.height // 2
+            self.center_y = SCREENHEIGHT - self.height // 2 
             
-            self.angle = 0
+            self.angle = 0 
         
         elif self.center_y - self.height // 2 < 0:
             self.center_y = 0 + self.height // 2
